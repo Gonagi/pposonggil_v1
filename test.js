@@ -5,9 +5,6 @@ const path = require('path');
 const fetch = require('node-fetch');
 const transport = require('./public_transport.js');
 
-// 백엔드에서 JSON 파일을 가져오는 URL을 설정
-//const jsonURL = 'https://gist.githubusercontent.com/sucocoa/f99b54ef5109c83b679f738f7dd82ea2/raw/1ec5037993962258400872363135bf68f054d0f9/test.json';
-
 async function readFile(filePath) {
     try {
         const data = await fs2.readFile(filePath, 'utf8');
@@ -24,14 +21,12 @@ async function createDynamicHTML(data) {
         var resource = data;
 
         const Routes = await transport.GetRoot(resource.start_lon, resource.start_lat, resource.end_lon, resource.end_lat);
-        //console.log('__dirname:', __dirname);
+
         const filePath = path.join(__dirname, '/views/result.html');
         const fileDataBuffer = await readFile(filePath);
         const fileData = fileDataBuffer.toString();
-        //console.log('filePath:', filePath);
 
         var PATH = '';
-        // console.log('Routes:', Routes);
         if (Routes.length > 0) {
             Routes.map((Path) => {
                 console.log('Path:', Path);
@@ -45,64 +40,62 @@ async function createDynamicHTML(data) {
                 else
                     TotalTimeString = `${minutes}분`;
 
-                if (Path.SubPaths && Path.SubPaths.length > 0) {//새로 추가함
-                    Path.SubPaths.map(SubPath => {
-                        if (subPath && subPath.length > 0) {//얘도 새로 추가
-                            var vehicleIcon = '';
-                            var additionalHtml = '';
-                            var vertical_bar = '';
+                Path.SubPaths.map(SubPath => {
+                    var vehicleIcon = '';
+                    var additionalHtml = '';
+                    var vertical_bar = '';
 
 
-                            switch (SubPath.Type) {
-                                case 'SUBWAY': //지하철이면
-                                    vehicleIcon = `
+                    switch (SubPath.Type) {
+                        case 'SUBWAY': //지하철이면
+                            vehicleIcon = `
                         <i class="fa-solid fa-subway" style="color:${SubPath.SubwayColor}"></i>
                         <span class="route-name">${SubPath.SubwayName}</span>`;
-                                    additionalHtml = `
+                            additionalHtml = `
                         <div class="route-list__vehicle-stop"></div>
                         <div>
                             ${SubPath.StartName} ~ ${SubPath.EndName}<br>
                             ${SubPath.StationCount}개 역<br>   
                         </div>`;
-                                    vertical_bar = `
+                            vertical_bar = `
                         <div class="route-list__bar" style="border-left: thick solid green">
                             ${SubPath.SectionTime}분
                         </div>`;
-                                    break;
-                                case 'BUS': //버스이면
-                                    const VehicleIcons = SubPath.LaneInfo.map(LaneInfo => `
+                            break;
+                        case 'BUS': //버스이면
+                            const VehicleIcons = SubPath.LaneInfo.map(LaneInfo => `
                         <i class="fa-solid fa-bus" style="color:${LaneInfo.BusColor}"></i>
                         <span class="route-name">${LaneInfo.BusNo}</span>
                         `).join('');
-                                    vehicleIcon = `
+                            vehicleIcon = `
                         <span class="route-name">
                             ${VehicleIcons}
                         </span>`;
-                                    additionalHtml = `
+                            additionalHtml = `
                         <div class="route-list__vehicle-stop"></div>
                         <div>
                             ${SubPath.StartName} ~ ${SubPath.EndName}<br>
                             ${SubPath.StationCount}정거장<br> 
                         </div>`;
-                                    vertical_bar = `
+                            vertical_bar = `
                     <div class="route-list__bar" style="border-left: thick solid blue">
                             ${SubPath.SectionTime}분
                         </div>`;
-                                    break;
-                                case 'WALK':
-                                    if (SubPath.SectionTime != 0) {
-                                        vehicleIcon = '<i class="fa-solid fa-person-walking"></i>';
-                                        additionalHtml = `
+                            break;
+                        case 'WALK':
+                            if (SubPath.SectionTime != 0) {
+                                vehicleIcon = '<i class="fa-solid fa-person-walking"></i>';
+                                additionalHtml = `
                         <div>${SubPath.Distance}m<br>
                         </div>`;
-                                        vertical_bar = `
+                                vertical_bar = `
                         <div class="route-list__bar" style="border-left: thick dotted black">
                             ${SubPath.SectionTime}분
                             </div>`;
-                                    }
-                                    break;
                             }
-                            SUBPATH += `
+                            break;
+                    }
+                    SUBPATH += `
                 <div class="reset">
                     
                         ${vertical_bar}
@@ -115,9 +108,9 @@ async function createDynamicHTML(data) {
                     </div> 
                </div>
             `;
-                        }
-                    });
-                }
+                    //   }
+                });
+                //     }
 
                 PATH += `
             <div class = "route-list">
