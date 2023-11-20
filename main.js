@@ -39,6 +39,9 @@ function getTimeStamp(i) {
 function leadingZeros(n, digits) {
     return n.toString().padStart(digits, '0');
 }
+
+//수정 2023.11.20 채수아
+//기존 main.js에서 test.js로 이동
 /*
 async function readFile(filePath) {
     try {
@@ -77,7 +80,7 @@ app.get('/main/POI', async (req, res) => {
 
 });
 
-//수정 
+//수정 2023.11.20 채수아
 const { createDynamicHTML } = require('./test.js');
 app.get('/main/POI/result', async (req, res) => {
     var resource = req.query;
