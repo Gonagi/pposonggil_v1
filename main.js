@@ -63,6 +63,15 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, '/public')));
 
+//main화면 map 추가
+//수정 2023.12.1 채수아
+app.get("/main", async (req, res) => {
+    const filePath = path.join(__dirname, "/views/map.html");
+    fs.readFile(filePath, "utf8", (err, data) => {
+        res.send(data);
+    });
+});
+
 app.get('/main/POI', async (req, res) => {
     let stime = getTimeStamp(1) + "1200";
     let itime = parseInt(stime, 10);
@@ -94,3 +103,5 @@ app.get('/main/POI/result', async (req, res) => {
 });
 
 https.createServer(options, app).listen(port);
+
+

@@ -48,6 +48,7 @@ async function createDynamicHTML(data) {
 
                     switch (SubPath.Type) {
                         case 'SUBWAY': //지하철이면
+                            console.log(SubPath.SubwayColor);
                             vehicleIcon = `
                         <i class="fa-solid fa-subway" style="color:${SubPath.SubwayColor}"></i>
                         <span class="route-name">${SubPath.SubwayName}</span>`;
@@ -58,11 +59,15 @@ async function createDynamicHTML(data) {
                             ${SubPath.StationCount}개 역<br>   
                         </div>`;
                             vertical_bar = `
-                        <div class="route-list__bar" style="border-left: thick solid green">
+                        <div class="route-list__bar" style="border-left: thick solid ${SubPath.SubwayColor}">
                             ${SubPath.SectionTime}분
                         </div>`;
                             break;
                         case 'BUS': //버스이면
+                            console.log(SubPath.LaneInfo[0].BusColor);
+                            console.log(SubPath.LaneInfo);
+                            const BusColor = SubPath.LaneInfo.BusColor;
+                            //   console.log(BusColor);
                             const VehicleIcons = SubPath.LaneInfo.map(LaneInfo => `
                         <i class="fa-solid fa-bus" style="color:${LaneInfo.BusColor}"></i>
                         <span class="route-name">${LaneInfo.BusNo}</span>
@@ -78,7 +83,7 @@ async function createDynamicHTML(data) {
                             ${SubPath.StationCount}정거장<br> 
                         </div>`;
                             vertical_bar = `
-                    <div class="route-list__bar" style="border-left: thick solid blue">
+                    <div class="route-list__bar" style="border-left: thick solid ${SubPath.LaneInfo[0].BusColor};}">
                             ${SubPath.SectionTime}분
                         </div>`;
                             break;
