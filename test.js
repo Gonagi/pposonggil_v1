@@ -59,9 +59,10 @@ async function createDynamicHTML(data) {
                             ${SubPath.StationCount}개 역<br>   
                         </div>`;
                             vertical_bar = `
-                        <div class="route-list__bar" style="border-left: thick solid ${SubPath.SubwayColor}">
+                        <div class="route-list__bar" style="border-left: thick solid ${SubPath.SubwayColor};">
                             ${SubPath.SectionTime}분
                         </div>`;
+
                             break;
                         case 'BUS': //버스이면
                             console.log(SubPath.LaneInfo[0].BusColor);
@@ -83,8 +84,8 @@ async function createDynamicHTML(data) {
                             ${SubPath.StationCount}정거장<br> 
                         </div>`;
                             vertical_bar = `
-                    <div class="route-list__bar" style="border-left: thick solid ${SubPath.LaneInfo[0].BusColor};}">
-                            ${SubPath.SectionTime}분
+                        <div class="route-list__bar" style="border-left: thick solid ${SubPath.LaneInfo[0].BusColor};">
+                                ${SubPath.SectionTime}분
                         </div>`;
                             break;
                         case 'WALK':
@@ -94,17 +95,17 @@ async function createDynamicHTML(data) {
                         <div>${SubPath.Distance}m<br>
                         </div>`;
                                 vertical_bar = `
-                        <div class="route-list__bar" style="border-left: thick dotted black">
+                        <div class="route-list__bar" style="border-left: thick dotted black;">
                             ${SubPath.SectionTime}분
-                            </div>`;
+                        </div>`;
                             }
                             break;
                     }
+                    //div class="reset_bar" height 수정 line107
+                    //수정 2023.12.1 채수아
                     SUBPATH += `
-                <div class="reset">
-                    
+                <div class="reset_bar" style="height:${(SubPath.SectionTime / Path.TotalTime) * 100}%;"> 
                         ${vertical_bar}
-                 
                     <div class="route-list__vehicle">
                         <div class="route-list__vehicle-info">
                             ${vehicleIcon}
@@ -113,10 +114,9 @@ async function createDynamicHTML(data) {
                     </div> 
                </div>
             `;
-                    //   }
                 });
-                //     }
-
+                //div class="total"수정 line 134
+                //수정 2023.12.1 채수아
                 PATH += `
             <div class = "route-list">
             <div class="route-list__column">
@@ -131,7 +131,9 @@ async function createDynamicHTML(data) {
                 </div>
             </div>
             <div class="route-list__vehicle">${resource.start}</div>
+            <div class="total">
             ${SUBPATH}
+            </div>
             <div class="route-list__vehicle">${resource.end}</div>    
             </div>`;
             });
