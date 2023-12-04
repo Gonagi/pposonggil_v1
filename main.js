@@ -1,22 +1,14 @@
 const express = require("express");
 const https = require("https");
-const transport = require("./public_transport.js");
 const fs = require("fs");
 const fs2 = require("fs").promises;
 const bodyParser = require("body-parser");
 const path = require("path");
-const url = require("url");
-const { resourceUsage } = require("process");
-const schedule = require("node-schedule");
-const forecast = require("./Ultra_Forecast.js");
 const weather = require("./get_weather_Data.js");
 const { createDynamicHTML } = require("./result.js");
 const cors = require("cors");
 var db = require("./db");
-
-const { Console } = require("console");
-const { dfs_xy_conv } = require("./convert_XY.js");
-const { default: axios } = require("axios");
+const td = require("./cal_time_date.js");
 
 const app = express();
 app.use(cors());
@@ -54,36 +46,6 @@ var locArr = [
   [59, 124],
   [61, 124],
 ];
-
-//날짜, 시간 구하기
-function getTimeStamp(i) {
-  var d = new Date();
-  if (i == 1) {
-    // 날짜
-    var s =
-      leadingZeros(d.getFullYear(), 4) +
-      leadingZeros(d.getMonth() + 1, 2) +
-      leadingZeros(d.getDate(), 2);
-  } else if (i == 2) {
-    // 시간
-    var s = leadingZeros(d.getHours(), 2) + leadingZeros(d.getMinutes(), 2);
-  } else if (i == 3) {
-    // 30분간격 4개의 시간 배열
-    let s0 = leadingZeros(d.getHours(), 2) + ":" + leadingZeros(d.getMinutes(), 2);
-    d.setMinutes(d.getMinutes() + 30);
-    let s1 = leadingZeros(d.getHours(), 2) + ":" + leadingZeros(d.getMinutes(), 2);
-    d.setMinutes(d.getMinutes() + 30);
-    let s2 = leadingZeros(d.getHours(), 2) + ":" + leadingZeros(d.getMinutes(), 2);
-    d.setMinutes(d.getMinutes() + 30);
-    let s3 = leadingZeros(d.getHours(), 2) + ":" + leadingZeros(d.getMinutes(), 2);
-    var s = [s0, s1, s2, s3];
-  }
-  return s;
-}
-
-function leadingZeros(n, digits) {
-  return n.toString().padStart(digits, "0");
-}
 
 async function readFile(filePath) {
   try {
