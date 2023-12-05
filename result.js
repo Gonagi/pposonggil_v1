@@ -61,7 +61,6 @@ async function createDynamicHTML(data) {
                         <div class="route-list__bar" style="border-left: thick solid ${SubPath.SubwayColor};">
                             ${SubPath.SectionTime}분
                         </div>`;
-
               break;
             case "BUS": //버스이면
               const VehicleIcons = SubPath.LaneInfo.map(
@@ -81,8 +80,8 @@ async function createDynamicHTML(data) {
                             ${SubPath.StationCount}정거장<br> 
                         </div>`;
               vertical_bar = `
-                        <div class="route-list__bar" style="border-left: thick solid ${SubPath.LaneInfo[0].BusColor};">
-                                ${SubPath.SectionTime}분
+                    <div class="route-list__bar" style="border-left: thick solid ${SubPath.LaneInfo[0].BusColor};">
+                            ${SubPath.SectionTime}분
                         </div>`;
               break;
             case "WALK":
@@ -92,25 +91,21 @@ async function createDynamicHTML(data) {
                         <div>${SubPath.Distance}m<br>
                         </div>`;
                 vertical_bar = `
-                        <div class="route-list__bar" style="border-left: thick dotted black;">
+                        <div class="route-list__bar" style="border-left: thick dotted black">
                             ${SubPath.SectionTime}분
-                        </div>`;
+                            </div>`;
               }
               break;
           }
-          //div class="reset_bar" height 수정 line107
-          //수정 2023.12.1 채수아
           SUBPATH += `
-                <div class="reset_bar" style="height:${
-                  (SubPath.SectionTime / Path.TotalTime) * 100
-                }%;"> 
+          <div class="reset_bar" style="height:${(SubPath.SectionTime / Path.TotalTime) * 100}%;"> 
                         ${vertical_bar}
                     <div class="route-list__vehicle">
                         <div class="route-list__vehicle-info">
                             ${vehicleIcon}
                             ${additionalHtml}
                         </div>
-                    </div> 
+                    </div>
                </div>
             `;
         });
@@ -142,9 +137,9 @@ async function createDynamicHTML(data) {
 
     const routeJSON = JSON.stringify(Routes);
     const finalTemplate = `${modifiedTemplate}
-        <script>
-            var Routes = ${routeJSON}
-        </script>`;
+    <script>
+      var Routes = ${routeJSON}
+    </script>`;
     return finalTemplate;
 
     //return modifiedTemplate;
