@@ -5,85 +5,124 @@
 <!-- 2023.12.04 김건학 
     격자 삭제
     검색 시각에 따라 30분 간격으로 4 시각 계산-->
+<!-- 2023.12.08 김건학 
+    시각 버튼 누르면 서버로 WalkData 전송,
+    WalkWeatherData 수신-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>뽀송타임</title>
 
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <meta charset="utf-8"/>
-        <title>뽀송타임</title>
-    
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Your Page Title</title>
-        <style>
-            body {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100vh;
-                margin: 0;
-            }
-        </style>
-    
-    </head>
-    <body>
-        <script type="module">
-            import {getTimeStamp} from "/js/cal_time.js";
-            window.Route_Time = getTimeStamp(3);
-        </script>
-        <div id="map" style="width:100vw;height:100vh; position: relative;">
-            <button id="TimeButton1" style="position: absolute; z-index:100; left: 5%;"></button>
-            <button id="TimeButton2" style="position: absolute; z-index:100; left: 15%;"></button>
-            <button id="TimeButton3" style="position: absolute; z-index:100; left: 25%;"></button>
-            <button id="TimeButton4" style="position: absolute; z-index:100; left: 35%;"></button>
-            <!-- <button id="TimeButton4" onclick="showGrid(3)" style="position: absolute; z-index:100; left: 35%;"></button> -->
-        </div>
-        <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b57b73ae393ddcbd717c07c95f05efd0"></script>
-        <script>
-            // localStorage에서 데이터를 가져옴
-            // 2023.12.05 김건학
-            // Route_Line --> Route 수정
-            const Route = JSON.parse(localStorage.getItem('Route')) || {};
-            // 지도에 표현할 날씨 데이터들 render
-            const receivedData = JSON.parse(`{{grid_data}}`);
-    
-            // 대중교통 루트 노드들의 가운데를 기준으로 지도 표현
-            let container = document.getElementById('map');
-            let options = {
-                center: new kakao.maps.LatLng(Route.mid_Lat, Route.mid_Lon),
-                level: 7
-            };
-            let map = new kakao.maps.Map(container, options);
-        </script>
-        <script type="module">
-            import { get_RouteLine, get_WalkData } from "/js/pposong.js";
-            // 루트 지도에 표현
-            get_RouteLine(Route);
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Page Title</title>
+    <style>
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+    </style>
 
-            // 2023.12.07 김건학
-            // 버튼에 시각 표현
-            document.getElementById("TimeButton1").innerText = window.Route_Time[0];    
-            document.getElementById("TimeButton2").innerText = window.Route_Time[1];
-            document.getElementById("TimeButton3").innerText = window.Route_Time[2];
-            document.getElementById("TimeButton4").innerText = window.Route_Time[3];
+</head>
+<body>
+    <script type="module">
+        import {getTimeStamp} from "/js/cal_time.js";
+        window.Route_Time = getTimeStamp(3);
+    </script>
+    <div id="map" style="width:100vw;height:100vh; position: relative;">
+        <button id="TimeButton1" style="position: absolute; z-index:100; left: 5%;"></button>
+        <button id="TimeButton2" style="position: absolute; z-index:100; left: 15%;"></button>
+        <button id="TimeButton3" style="position: absolute; z-index:100; left: 25%;"></button>
+        <button id="TimeButton4" style="position: absolute; z-index:100; left: 35%;"></button>
+        <!-- <button id="TimeButton4" onclick="showGrid(3)" style="position: absolute; z-index:100; left: 35%;"></button> -->
+    </div>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b57b73ae393ddcbd717c07c95f05efd0"></script>
+    <script src='https://unpkg.com/axios/dist/axios.min.js'></script>
+
+    <script>
+        // localStorage에서 데이터를 가져옴
+        // 2023.12.05 김건학
+        // Route_Line --> Route 수정
+        const Route = JSON.parse(localStorage.getItem('Route')) || {};
+        // 지도에 표현할 날씨 데이터들 render
+        const receivedData = JSON.parse(`{{grid_data}}`);
+
+        // 대중교통 루트 노드들의 가운데를 기준으로 지도 표현
+        let container = document.getElementById('map');
+        let options = {
+            center: new kakao.maps.LatLng(Route.mid_Lat, Route.mid_Lon),
+            level: 7
+        };
+        let map = new kakao.maps.Map(container, options);
+    </script>
+    <script type="module">
+        import { get_RouteLine, get_WalkData } from "/js/pposong.js";
+
+        get_RouteLine(Route);
+
+        // 2023.12.07 김건학
+        // 버튼에 시각 표현
+        document.getElementById("TimeButton1").innerText = window.Route_Time[0];    
+        document.getElementById("TimeButton2").innerText = window.Route_Time[1];
+        document.getElementById("TimeButton3").innerText = window.Route_Time[2];
+        document.getElementById("TimeButton4").innerText = window.Route_Time[3];
 
 
-            document.getElementById("TimeButton1").addEventListener("click", function() {
-                window.XY_TIME = get_XY_Time(Route, Route_Time[0]);
+        // 2023.12.08 김건학
+        var WalkWeatherData 
+        document.getElementById("TimeButton1").addEventListener("click", function() {
+            window.WalkData = get_WalkData(Route, Route_Time[0]);
+            
+            // 서버로 걷는 구간들 데이터 전송
+            axios.post("/main/POI/result/pposong/cal", { WalkData: window.WalkData })
+            .then(response => {
+                WalkWeatherData = response.data.response;
+            })
+            .catch(error => {
+                console.error('Error sending data to server:', error);
             });
+        });
 
-            document.getElementById("TimeButton2").addEventListener("click", function() {
-                window.XY_TIME = get_XY_Time(Route, Route_Time[1]);
+        document.getElementById("TimeButton2").addEventListener("click", function() {
+            window.WalkData = get_WalkData(Route, Route_Time[1]);
+            // 서버로 걷는 구간들 데이터 전송
+            axios.post("/main/POI/result/pposong/cal", { WalkData: window.WalkData })
+            .then(response => {
+                WalkWeatherData = response.data.response;
+            })
+            .catch(error => {
+                console.error('Error sending data to server:', error);
             });
+        });
 
-            document.getElementById("TimeButton3").addEventListener("click", function() {
-                window.XY_TIME = get_XY_Time(Route,  Route_Time[2]);
+        document.getElementById("TimeButton3").addEventListener("click", function() {
+            window.WalkData = get_WalkData(Route,  Route_Time[2]);
+            // 서버로 걷는 구간들 데이터 전송
+            axios.post("/main/POI/result/pposong/cal", { WalkData: window.WalkData })
+            .then(response => {
+                WalkWeatherData = response.data.response;
+            })
+            .catch(error => {
+                console.error('Error sending data to server:', error);
             });
+        });
 
-            document.getElementById("TimeButton4").addEventListener("click", function() {
-                window.XY_TIME = get_XY_Time(Route,  Route_Time[3]);
+        document.getElementById("TimeButton4").addEventListener("click", function() {
+            window.WalkData = get_WalkData(Route,  Route_Time[3]);
+            // 서버로 걷는 구간들 데이터 전송
+            axios.post("/main/POI/result/pposong/cal", { WalkData: window.WalkData })
+            .then(response => {
+                WalkWeatherData = response.data.response;
+            })
+            .catch(error => {
+                console.error('Error sending data to server:', error);
             });
+        });
 
-        </script>
-        <script type="module" src="/js/map.js" async></script>
-    </body>
-    </html>
+    </script>
+    <script type="module" src="/js/map.js" async></script>
+</body>
+</html>
