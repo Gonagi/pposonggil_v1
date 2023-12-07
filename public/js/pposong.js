@@ -41,6 +41,8 @@ export function get_RouteLine(Route) {
   }
 }
 
+// 2023.12.08 김건학
+// WalkData 받아오는 함수 구현
 export function get_WalkData(Route, time) {
   var Walk_Data = [];
   var cur_time = time;
@@ -61,6 +63,7 @@ export function get_WalkData(Route, time) {
         X: xy.x,
         Y: xy.y,
         basetime: cur_basetime,
+        sectiontime: subpath.SectionTime,
       };
       Walk_Data.push(cur_walkdata);
     }
