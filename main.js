@@ -10,6 +10,8 @@ const cors = require("cors");
 var db = require("./db");
 const td = require("./cal_time_date.js");
 const forecast = require("./Ultra_Forecast.js");
+const schedule = require("node-schedule");
+
 const app = express();
 app.use(cors());
 
@@ -132,6 +134,56 @@ app.get("/main/POI/result/pposong", async (req, res) => {
   const filePath = path.join(__dirname, "/views/pposong.html");
   await getWeatherDataAndRenderPage(filePath, res);
 });
+
+// 2023.12.08 김건학
+// pposong.html에서 보낸 도보 데이터 받기, db검색 후 파싱, pposong.html로 데이터 전송
+app.post("/main/POI/result/pposong/cal", async (req, res) => {
+  const receivedData = req.body;
+  // console.log("Received data from client:", receivedData);
+  const sectionData = [];
+  var sum_RN1 = 0;
+  try {
+    for (const walkData of receivedData.WalkData) {
+      const weatherData = await queryAsync(
+        "SELECT * FROM FORECAST WHERE TIME = ? AND X = ? AND Y =  ?",
+        [walkData.basetime, walkData.X, walkData.Y]
+      );
+      var section_RN1 = (weatherData[0].RN1 * walkData.sectiontime) / 60;
+      sum_RN1 += section_RN1;
+      sectionData.push({
+        DATE: weatherData[0].DATE,
+        REH: weatherData[0].REH,
+        RN1: weatherData[0].RN1,
+        T1H: weatherData[0].T1H,
+        TIME: weatherData[0].TIME,
+        WSD: weatherData[0].WSD,
+        X: weatherData[0].X,
+        Y: weatherData[0].Y,
+        section_RN1: section_RN1,
+      });
+    }
+    var resultData = {
+      sum_RN1: sum_RN1,
+      walkData: sectionData,
+    };
+  } catch (error) {
+    console.error(error);
+  }
+  console.log(resultData);
+  res.json({ response: resultData });
+});
+
+function queryAsync(sql, params) {
+  return new Promise((resolve, reject) => {
+    db.query(sql, params, (error, results, fields) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
 
 const httpsServer = https.createServer(options, app);
 
