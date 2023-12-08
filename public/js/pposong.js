@@ -43,33 +43,42 @@ export function get_RouteLine(Route) {
 
 // 2023.12.08 김건학
 // WalkData 받아오는 함수 구현
+
+// 2023.12.08 김건학
+// 한 time의 walkData를 받아오는 기존 방식을 4 time 모두 받는 방식으로 변경
+
 export function get_WalkData(Route, time) {
-  var Walk_Data = [];
-  var cur_time = time;
-  var cur_basetime;
+  var WalkData = [];
 
-  for (var idx = 0; idx < Route.SubPaths.length; idx++) {
-    var subpath = Route.SubPaths[idx];
-    // 도보 구간
-    if (subpath.Type == "WALK") {
-      var MidLat = (subpath.StartLat + subpath.EndLat) / 2;
-      var MidLon = (subpath.StartLon + subpath.EndLon) / 2;
-      var xy = dfs_xy_conv("toXY", MidLat, MidLon);
-      cur_basetime = convertTimeFormat(cur_time);
+  for (var time_idx = 0; time_idx < time.length; time_idx++) {
+    var cur_time = time[time_idx];
+    var cur_basetime;
+    var SectionData = [];
 
-      var cur_walkdata = {
-        MidLat: MidLat,
-        MidLon: MidLon,
-        X: xy.x,
-        Y: xy.y,
-        basetime: cur_basetime,
-        sectiontime: subpath.SectionTime,
-      };
-      Walk_Data.push(cur_walkdata);
+    for (var idx = 0; idx < Route.SubPaths.length; idx++) {
+      var subpath = Route.SubPaths[idx];
+      // 도보 구간
+      if (subpath.Type == "WALK") {
+        var MidLat = (subpath.StartLat + subpath.EndLat) / 2;
+        var MidLon = (subpath.StartLon + subpath.EndLon) / 2;
+        var xy = dfs_xy_conv("toXY", MidLat, MidLon);
+        cur_basetime = convertTimeFormat(cur_time);
+
+        var cur_walkdata = {
+          MidLat: MidLat,
+          MidLon: MidLon,
+          X: xy.x,
+          Y: xy.y,
+          basetime: cur_basetime,
+          sectiontime: subpath.SectionTime,
+        };
+        SectionData.push(cur_walkdata);
+      }
+
+      cur_time = addTime(cur_time, subpath.SectionTime);
     }
-
-    cur_time = addTime(cur_time, subpath.SectionTime);
+    WalkData.push(SectionData);
   }
 
-  return Walk_Data;
+  return WalkData;
 }
