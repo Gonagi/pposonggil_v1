@@ -102,10 +102,7 @@ app.get("/main", async (req, res) => {
 });
 
 app.get("/main/POI", async (req, res) => {
-  let stime = td.getTimeStamp(1) + "1200";
-  let itime = parseInt(stime, 10);
   const filePath = path.join(__dirname, "/views/mainFunc.html");
-  let Routes = {};
 
   fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {
