@@ -64,7 +64,6 @@
     position: relative;
 }
 
-
 .route-list__bar::before {
     content: "🔻";
     position: absolute;
@@ -72,14 +71,6 @@
     top: -2px;
     /* 내용이 선 왼쪽에 위치하도록 조절 (음수 값은 선 왼쪽으로 이동) */
 }
-
-/* .route-list__bar::before {
-    content: "\2022";
-    /* 유니코드로 점(.)을 나타냄 */
-/* display: inline-block;
-margin-right: 5px;
-/* 추가적인 여백 조절 가능 */
-
 
 .route-list__bar-detail {
     margin-right: 10px;
@@ -100,9 +91,4 @@ margin-right: 5px;
     display: flex;
     font-size: 18px;
     height: 100%;
-}
-
-.icon {
-    float: left;
-    height: 0.001%;
 }
