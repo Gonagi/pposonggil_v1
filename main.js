@@ -137,39 +137,45 @@ app.get("/main/POI/result/pposong", async (req, res) => {
 
 // 2023.12.08 김건학
 // pposong.html에서 보낸 도보 데이터 받기, db검색 후 파싱, pposong.html로 데이터 전송
+
+// 2023.12.08 김건학
+// pposong.html에서 보낸 도보 데이터 받기, db검색 후 파싱, pposong.html로 데이터 전송
+// 한 time의 데이터만 받아오는 기존 방식을 4 time 데이터 모두 받게 수정
 app.post("/main/POI/result/pposong/cal", async (req, res) => {
   const receivedData = req.body;
-  // console.log("Received data from client:", receivedData);
-  const sectionData = [];
-  var sum_RN1 = 0;
+  var resultData = [];
   try {
     for (const walkData of receivedData.WalkData) {
-      const weatherData = await queryAsync(
-        "SELECT * FROM FORECAST WHERE TIME = ? AND X = ? AND Y =  ?",
-        [walkData.basetime, walkData.X, walkData.Y]
-      );
-      var section_RN1 = (weatherData[0].RN1 * walkData.sectiontime) / 60;
-      sum_RN1 += section_RN1;
-      sectionData.push({
-        DATE: weatherData[0].DATE,
-        REH: weatherData[0].REH,
-        RN1: weatherData[0].RN1,
-        T1H: weatherData[0].T1H,
-        TIME: weatherData[0].TIME,
-        WSD: weatherData[0].WSD,
-        X: weatherData[0].X,
-        Y: weatherData[0].Y,
-        section_RN1: section_RN1,
-      });
+      const sectionData = [];
+      var sum_RN1 = 0;
+      for (const section of walkData) {
+        const weatherData = await queryAsync(
+          "SELECT * FROM FORECAST WHERE TIME = ? AND X = ? AND Y =  ?",
+          [section.basetime, section.X, section.Y]
+        );
+        var section_RN1 = (weatherData[0].RN1 * section.sectiontime) / 60;
+        sum_RN1 += section_RN1;
+        sectionData.push({
+          DATE: weatherData[0].DATE,
+          REH: weatherData[0].REH,
+          RN1: weatherData[0].RN1,
+          T1H: weatherData[0].T1H,
+          TIME: weatherData[0].TIME,
+          WSD: weatherData[0].WSD,
+          X: weatherData[0].X,
+          Y: weatherData[0].Y,
+          section_RN1: section_RN1,
+        });
+      }
+      var WalkWeatherData = {
+        sum_RN1: sum_RN1,
+        walkData: sectionData,
+      };
+      resultData.push(WalkWeatherData);
     }
-    var resultData = {
-      sum_RN1: sum_RN1,
-      walkData: sectionData,
-    };
   } catch (error) {
     console.error(error);
   }
-  console.log(resultData);
   res.json({ response: resultData });
 });
 
