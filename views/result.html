@@ -1,3 +1,6 @@
+<!-- 2023.12.08 김건학
+     루트 선택 시localStorage에 start, end 저장  -->
+    
 <!DOCTYPE html>
 <html lang="en">
 
@@ -59,15 +62,28 @@
             Paths.forEach(function (Path, idx){
                 Path.addEventListener('click', function (){
                     var Click_Path = Routes[idx];
+                    
+                    // 2023.12.08 김건학
+                    // url에서 start, end 데이터 받아오고
+                    var start = new URLSearchParams(window.location.search).get('start');
+                    var end = new URLSearchParams(window.location.search).get('end');
+
                     axios.get('https://localhost:1521/main/POI/result/pposong', {
                         params:{
-                            Route :Click_Path
+                            Route :Click_Path,
+                            start:start,
+                            end:end
                         }
                     }).then(function (response){
                         // 페이지 변경 전에 데이터를 localStorage에 저장
                         // 2023.12.05 김건학
                         // Route_Line --> Route 수정
+                        
+                        // 2023.12.08 김건학
+                        // start, end도 localStorage에 저장
                         localStorage.setItem('Route', JSON.stringify(Click_Path));
+                        localStorage.setItem('start', start);
+                        localStorage.setItem('end', end);
                         
                         // 페이지 변경
                         var newPageURL = 'https://localhost:1521/main/POI/result/pposong';
@@ -86,6 +102,3 @@
 </body>
 
 </html>
-
-
-
