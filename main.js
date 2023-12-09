@@ -103,6 +103,7 @@ app.get("/main", async (req, res) => {
 
 app.get("/main/POI", async (req, res) => {
   const filePath = path.join(__dirname, "/views/mainFunc.html");
+  let Routes = {};
 
   fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {
@@ -138,6 +139,9 @@ app.get("/main/POI/result/pposong", async (req, res) => {
 // 2023.12.08 김건학
 // pposong.html에서 보낸 도보 데이터 받기, db검색 후 파싱, pposong.html로 데이터 전송
 // 한 time의 데이터만 받아오는 기존 방식을 4 time 데이터 모두 받게 수정
+
+// 2023.12.09 김건학
+// 강수량 소수점 둘째자리까지만 표현
 app.post("/main/POI/result/pposong/cal", async (req, res) => {
   const receivedData = req.body;
   var resultData = [];
@@ -150,8 +154,9 @@ app.post("/main/POI/result/pposong/cal", async (req, res) => {
           "SELECT * FROM FORECAST WHERE TIME = ? AND X = ? AND Y =  ?",
           [section.basetime, section.X, section.Y]
         );
-        var section_RN1 = (weatherData[0].RN1 * section.sectiontime) / 60;
+        var section_RN1 = parseFloat(((weatherData[0].RN1 * section.sectiontime) / 60).toFixed(2));
         sum_RN1 += section_RN1;
+
         sectionData.push({
           DATE: weatherData[0].DATE,
           REH: weatherData[0].REH,
@@ -192,7 +197,8 @@ const httpsServer = https.createServer(options, app);
 
 httpsServer.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
-  // schedule.scheduleJob("10 0,10,20,30,40,50 * * * *", async function () {
+  // // schedule.scheduleJob("10 0,10,20,30,40,50 * * * *", async function () {
+  // schedule.scheduleJob("30 * * * * *", async function () {
   //   const input_date = td.getTimeStamp(1);
   //   const input_time = td.getTimeStamp(2);
   //   const promises = [];
@@ -202,14 +208,11 @@ httpsServer.listen(port, () => {
   //   console.log("________________________________");
   //   console.log(`Forecast Updating Started[${HH}:${MM}]`);
   //   console.time(`Forecast Update[${HH}:${MM}] 소요시간`);
-
   //   for (let i = 0; i < 30; i++) {
   //     try {
   //       const input_x = locArr[i][0];
   //       const input_y = locArr[i][1];
-
   //       var Data = forecast.get_Ultra_Forecast_Data(input_date, input_time, input_x, input_y);
-
   //       promises.push(Data);
   //     } catch (error) {
   //       console.log("ERROR MERGED");
@@ -217,11 +220,9 @@ httpsServer.listen(port, () => {
   //       i--;
   //     }
   //   }
-
   //   const ultra_forecast_datas = await Promise.all(promises);
   //   console.log(`Promise End([${HH}:${MM}]날씨 데이터)`);
   //   //console.log(ultra_forecast_datas);
-
   //   //40~44(분)인 경우, 현재 시간의 날씨 데이터를 사용해야 한다.
   //   if (40 <= input_time % 100 && input_time % 100 <= 44) {
   //     db.query(
@@ -231,7 +232,6 @@ httpsServer.listen(port, () => {
   //         if (error) throw error;
   //       }
   //     );
-
   //     for (let i = 0; i < 30; i++) {
   //       for (let j = 0; j < 5; j++) {
   //         try {
