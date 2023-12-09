@@ -1,4 +1,7 @@
-'<!DOCTYPE html>
+<!-- 2023.12.08 김건학
+     루트 선택 시localStorage에 start, end 저장  -->
+
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -12,13 +15,13 @@
     <div class="status-bar">
         <div class="status-bar__column">
             <span>PPOSONG</span>
-            <!-- Icon -->
+
             <i class="fa-solid fa-cloud" style="color: #9fd8f6;"></i>
         </div>
 
         <div class="status-bar__column">
             <span>ver 0.5.1</span>
-            <!-- version information &Icon-->
+
         </div>
     </div>
 
@@ -27,10 +30,10 @@
             <i class="fa-solid fa-angle-left fa-xl"></i>
         </div>
         <div class="alt-header__column">
-            <h1 class="alt-header__title">뽀송길 검색 결과</h1>
+            <h1 class="alt-header__title">경로 검색결과</h1>
         </div>
         <div class="alt-header__column">
-            <!-- 헤더 우측에 위치한 홈/마이페이지 버튼 -->
+
             <nav class="screen-header__menu">
                 <ul class="screen-header__menu-list">
                     <li class="screen-header__menu-btn">
@@ -51,6 +54,59 @@
 
     <script src="https://kit.fontawesome.com/660f4d6ed1.js" crossorigin="anonymous"></script>
     <script src="/js/back.js"></script>
+</body>
+
+</html>
+
+
+<script type="text/javascript"
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=25bfb6a07f5ba2e6cbae00de61e6777f"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    // route list 클릭 시 화면 전환
+    document.addEventListener('DOMContentLoaded', function () {
+        var Paths = document.querySelectorAll('.route-list');
+        Paths.forEach(function (Path, idx) {
+            Path.addEventListener('click', function () {
+                var Click_Path = Routes[idx];
+
+                // 2023.12.08 김건학
+                // url에서 start, end 데이터 받아오고
+                var start = new URLSearchParams(window.location.search).get('start');
+                var end = new URLSearchParams(window.location.search).get('end');
+
+                axios.get('https://localhost:1521/main/POI/result/pposong', {
+                    //클릭한 route에 해당하는 데이터를 서버에 요청
+                    params: {
+                        Route: Click_Path,
+                        start:start,
+                        end:end
+                    }
+                }).then(function (response) {
+                    // 페이지 변경 전에 데이터를 localStorage에 저장
+                    // 2023.12.05 김건학
+                    // Route_Line --> Route 수정
+
+                    // 2023.12.08 김건학
+                    // start, end도 localStorage에 저장
+                    localStorage.setItem('Route', JSON.stringify(Click_Path));
+                    localStorage.setItem('start', start);
+                    localStorage.setItem('end', end);
+
+                    // 페이지 변경
+                    var newPageURL = 'https://localhost:1521/main/POI/result/pposong';
+                    window.location.href = newPageURL;
+                }).catch(function (error) {
+                    console.error('Error:', error);
+                });
+            });
+
+        });
+    });
+</script>
+
+<script src="https://kit.fontawesome.com/660f4d6ed1.js" crossorigin="anonymous"></script>
+<script src="/js/back.js"></script>
 </body>
 
 </html>

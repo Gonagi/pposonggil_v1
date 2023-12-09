@@ -2,7 +2,7 @@
 const routeListDivs = document.querySelectorAll(".route-list");
 
 routeListDivs.forEach(routeListDiv => {
-  routeListDiv.addEventListener("click", function(event) {
+  routeListDiv.addEventListener("click", function (event) {
 
     const FULL_STAR = "fa-solid";
     const EMPTY_STAR = "fa-regular";
